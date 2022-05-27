@@ -1,0 +1,62 @@
+version: '3.9'
+services:
+  app:
+    container_name: go_api_container
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - TEST_DB_USER=${TEST_DB_USER}
+      - TEST_DB_PASSWORD=${TEST_DB_PASSWORD}
+      - TEST_DB_NAME=${TEST_DB_NAME}
+      - TEST_DB_HOST=${TEST_DB_HOST}
+      - TEST_DB_PORT=${TEST_DB_PORT}
+    tty: true
+    build: .
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    volumes:
+      - .:/app
+    depends_on:
+      - mariadb
+    networks:
+      - app_esportal
+
+  mariadb:
+    image: mariadb/server:10.5
+    container_name: mariadb_container
+    environment:
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_NAME}
+      - MARIADB_USER=${DB_USER}
+      - MARIADB_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "33066:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app_esportal
+
+  mariadb_test:
+    image: mariadb/server:10.5
+    container_name: mariadb_test_container
+    environment:
+      - MARIADB_ROOT_PASSWORD=${TEST_DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${TEST_DB_NAME}
+      - MARIADB_USER=${TEST_DB_USER}
+      - MARIADB_PASSWORD=${TEST_DB_PASSWORD}
+    ports:
+      - "33067:3306"
+    volumes:
+      - db_data_test:/var/lib/mysql
+    networks:
+      - app_esportal
+
+volumes:
+  db_data:
+  db_data_test:
+
+networks:
+  app_esportal:
+    driver: bridge

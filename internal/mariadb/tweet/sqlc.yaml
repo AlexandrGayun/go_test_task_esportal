@@ -1,0 +1,8 @@
+version: 1
+packages:
+  - path: "db"
+    name: "db"
+    engine: "mysql"
+    schema: "../../../db/migrations/"
+    queries: "query"
+    emit_empty_slices: true
